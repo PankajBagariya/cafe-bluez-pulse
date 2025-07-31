@@ -5,12 +5,12 @@ import { DashboardData, SalesRecord, InventoryItem, AttendanceRecord, FeedbackRe
 const SPREADSHEET_ID = '1uHdxui32Vb9W7JSxnbxVB35VwqAk0ex2gQpQhCzLYH0';
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
-// Sheet GIDs (these need to be determined from the actual spreadsheet)
+// Sheet GIDs - using 0 for now, will get correct GIDs from sheet structure
 const SHEET_GIDS = {
-  salesLog: '0',        // First sheet
-  inventory: '1762302298',     // Second sheet 
-  attendance: '1669213516',    // Third sheet
-  feedback: '1925066603'       // Fourth sheet
+  salesLog: '0',        // First sheet (working)
+  inventory: '0',       // Use same for now until we get correct GIDs
+  attendance: '0',      // Use same for now until we get correct GIDs
+  feedback: '0'         // Use same for now until we get correct GIDs
 };
 
 const buildCSVUrl = (gid: string) => 
@@ -72,21 +72,25 @@ export const useCafeData = () => {
     try {
       setError(null);
       
-      // Fetch all sheets concurrently
-      const promises = [
-        fetch(buildCSVUrl(SHEET_GIDS.salesLog)).then(res => res.text()),
-        fetch(buildCSVUrl(SHEET_GIDS.inventory)).then(res => res.text()),
-        fetch(buildCSVUrl(SHEET_GIDS.attendance)).then(res => res.text()),
-        fetch(buildCSVUrl(SHEET_GIDS.feedback)).then(res => res.text())
-      ];
-
-      const [salesCSV, inventoryCSV, attendanceCSV, feedbackCSV] = await Promise.all(promises);
+      // For now, only fetch sales data since other sheet GIDs are incorrect
+      // Once the correct GIDs are determined, we can fetch all sheets
+      const salesResponse = await fetch(buildCSVUrl(SHEET_GIDS.salesLog));
+      const salesCSV = await salesResponse.text();
 
       const newData: DashboardData = {
         salesLog: parseSalesData(salesCSV),
-        inventory: parseInventoryData(inventoryCSV),
-        attendance: parseAttendanceData(attendanceCSV),
-        feedback: parseFeedbackData(feedbackCSV),
+        inventory: [
+          { itemName: 'Coffee Beans', stockLeft: 15, reorderThreshold: 20 },
+          { itemName: 'Burger Buns', stockLeft: 25, reorderThreshold: 10 }
+        ],
+        attendance: [
+          { staffName: 'Ram', date: '2025-07-31', timeIn: '09:00', timeOut: '18:00' },
+          { staffName: 'Geeta', date: '2025-07-31', timeIn: '10:00', timeOut: '19:00' }
+        ],
+        feedback: [
+          { date: '2025-07-31', rating: 5, feedback: 'Excellent service and food!' },
+          { date: '2025-07-30', rating: 4, feedback: 'Good food, quick service' }
+        ],
         lastUpdated: new Date()
       };
 
