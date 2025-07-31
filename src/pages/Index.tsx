@@ -6,6 +6,7 @@ import { SalesChart } from '../components/SalesChart';
 import { InventorySection } from '../components/InventorySection';
 import { AttendanceSection } from '../components/AttendanceSection';
 import { FeedbackSection } from '../components/FeedbackSection';
+import { Chatbot } from '../components/Chatbot';
 
 const Index = () => {
   const { data, loading, error, refetch } = useCafeData();
@@ -54,6 +55,9 @@ const Index = () => {
           <p className="mt-1">Built with ❤️ for efficient cafe management</p>
         </footer>
       </div>
+      
+      {/* Chatbot */}
+      <Chatbot data={data} />
     </div>
   );
 };
